@@ -3,6 +3,7 @@ package cn.solarmoon.solarmoon_core.api.tile;
 import cn.solarmoon.solarmoon_core.api.event.BlockEntityDataEvent;
 import cn.solarmoon.solarmoon_core.api.tile.fluid.ITankTile;
 import cn.solarmoon.solarmoon_core.api.tile.inventory.IContainerTile;
+import cn.solarmoon.solarmoon_core.api.tile.inventory.ItemHandlerUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -17,18 +18,12 @@ public class BlockEntityDataHolder {
         BlockEntity be = event.getBlockEntity();
         CompoundTag tag = event.getTag();
         if (be instanceof IContainerTile c) {
-            tag.put(IContainerTile.INVENTORY, c.getInventory().serializeNBT());
+            tag.put(ItemHandlerUtil.INVENTORY, c.getInventory().serializeNBT());
         }
         if (be instanceof ITankTile t) {
             CompoundTag fluid = new CompoundTag();
             t.getTank().writeToNBT(fluid);
             tag.put(FluidHandlerItemStack.FLUID_NBT_KEY, fluid);
-        }
-        if (be instanceof ITimeRecipeTile<?> time) {
-            tag.putInt(ITimeRecipeTile.TIME, time.getTime());
-        }
-        if (be instanceof IIndividualTimeRecipeTile<?> in) {
-            tag.putIntArray(IIndividualTimeRecipeTile.SINGLE_STACK_TIME, in.getTimes());
         }
     }
 
@@ -37,19 +32,10 @@ public class BlockEntityDataHolder {
         BlockEntity be = event.getBlockEntity();
         CompoundTag tag = event.getTag();
         if (be instanceof IContainerTile c) {
-            c.getInventory().deserializeNBT(tag.getCompound(IContainerTile.INVENTORY));
+            c.getInventory().deserializeNBT(tag.getCompound(ItemHandlerUtil.INVENTORY));
         }
         if (be instanceof ITankTile t) {
             t.getTank().readFromNBT(tag.getCompound(FluidHandlerItemStack.FLUID_NBT_KEY));
-        }
-        if (be instanceof ITimeRecipeTile<?> time) {
-            time.setTime(tag.getInt(ITimeRecipeTile.TIME));
-        }
-        if (be instanceof IIndividualTimeRecipeTile<?> in) {
-            int[] getFrom = tag.getIntArray(IIndividualTimeRecipeTile.SINGLE_STACK_TIME);
-            if (getFrom.length != 0) {
-                in.setTimes(getFrom);
-            }
         }
     }
 

@@ -17,9 +17,9 @@ public class TileItemContainerHelper {
     public static Optional<ItemStackHandler> getInventory(ItemStack stack) {
         CompoundTag tag = BlockItem.getBlockEntityData(stack);
         ItemStackHandler inv = null;
-        if (tag != null && tag.contains(IContainerTile.INVENTORY)) {
+        if (tag != null && tag.contains(ItemHandlerUtil.INVENTORY)) {
             inv = new ItemStackHandler();
-            inv.deserializeNBT(tag.getCompound(IContainerTile.INVENTORY));
+            inv.deserializeNBT(tag.getCompound(ItemHandlerUtil.INVENTORY));
         }
         return Optional.ofNullable(inv);
     }
@@ -27,7 +27,7 @@ public class TileItemContainerHelper {
     public static void setInventory(ItemStack stack, ItemStackHandler inv) {
         CompoundTag tag = BlockItem.getBlockEntityData(stack);
         tag = tag == null ? stack.getOrCreateTagElement(BlockItem.BLOCK_ENTITY_TAG) : tag;
-        tag.put(IContainerTile.INVENTORY, inv.serializeNBT());
+        tag.put(ItemHandlerUtil.INVENTORY, inv.serializeNBT());
     }
 
 }

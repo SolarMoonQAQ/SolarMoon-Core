@@ -3,8 +3,6 @@ package cn.solarmoon.solarmoon_core.mixin;
 
 import cn.solarmoon.solarmoon_core.api.ability.CustomPlaceableItem;
 import cn.solarmoon.solarmoon_core.api.tile.fluid.ITankTileItem;
-import cn.solarmoon.solarmoon_core.api.tile.inventory.TileItemFluidHandler;
-import cn.solarmoon.solarmoon_core.api.item_util.ITankItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
@@ -19,7 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.extensions.IForgeItem;
-import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,10 +30,7 @@ public abstract class ItemMixin implements IForgeItem {
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
         Item item = stack.getItem();
         if (item instanceof ITankTileItem tankItem) {
-            return new TileItemFluidHandler(stack, tankItem.getMaxCapacity());
-        }
-        if (item instanceof ITankItem tankItem) {
-            return new FluidHandlerItemStack(stack, tankItem.getMaxCapacity());
+            return tankItem.initTank(stack);
         }
         return IForgeItem.super.initCapabilities(stack, nbt);
     }

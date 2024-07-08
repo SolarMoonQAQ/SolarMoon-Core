@@ -1,13 +1,9 @@
 package cn.solarmoon.solarmoon_core.api.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 /**
@@ -16,14 +12,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
  */
 public abstract class BaseBlockEntityRenderer<E extends BlockEntity> implements BlockEntityRenderer<E> {
 
-    protected ItemRenderer itemRenderer;
-    protected BlockRenderDispatcher blockRenderDispatcher;
-    protected ClientLevel level;
+    protected BlockEntityRendererProvider.Context context;
 
      public BaseBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-         this.itemRenderer = context.getItemRenderer();
-         this.blockRenderDispatcher = context.getBlockRenderDispatcher();
-         this.level = Minecraft.getInstance().level;
+         this.context = context;
      }
 
     @Override

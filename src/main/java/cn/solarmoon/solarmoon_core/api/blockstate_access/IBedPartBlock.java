@@ -1,6 +1,8 @@
 package cn.solarmoon.solarmoon_core.api.blockstate_access;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -16,6 +18,11 @@ public interface IBedPartBlock extends IHorizontalFacingBlock {
 
     default Direction getNeighbourDirection(BedPart part, Direction direction) {
         return part == BedPart.FOOT ? direction : direction.getOpposite();
+    }
+
+    default BlockPos getFootPos(BlockState state, BlockPos pos) {
+        Direction nb = getNeighbourDirection(state.getValue(PART), state.getValue(FACING));
+        return state.getValue(PART) == BedPart.FOOT ? pos : pos.relative(nb);
     }
 
 }

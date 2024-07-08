@@ -51,7 +51,7 @@ public abstract class BlockMixin extends BlockBehaviour {
             state = state.setValue(stackBlock.STACK, 1);
         }
         if (block instanceof ILitBlock litBlock) {
-            state = state.setValue(litBlock.LIT, false);
+            state = state.setValue(litBlock.LIT, litBlock.defaultLitValue());
         }
         if (block instanceof INoLimitAgeBlock nlAgeBlock) {
             state = state.setValue(nlAgeBlock.AGE, 0);

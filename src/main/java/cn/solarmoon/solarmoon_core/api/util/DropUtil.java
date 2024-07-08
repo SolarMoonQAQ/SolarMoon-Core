@@ -12,7 +12,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 import java.util.Random;
 
-public class LevelSummonUtil {
+public class DropUtil {
 
     /**
      * 生成基础掉落物

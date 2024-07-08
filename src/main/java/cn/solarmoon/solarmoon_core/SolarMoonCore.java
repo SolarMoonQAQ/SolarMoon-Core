@@ -1,8 +1,8 @@
 package cn.solarmoon.solarmoon_core;
 
 import cn.solarmoon.solarmoon_core.api.entry.ObjectRegistry;
-import cn.solarmoon.solarmoon_core.api.static_utor.Debug;
-import cn.solarmoon.solarmoon_core.api.static_utor.Translator;
+import cn.solarmoon.solarmoon_core.api.starter_kit.Debug;
+import cn.solarmoon.solarmoon_core.api.starter_kit.Translator;
 import cn.solarmoon.solarmoon_core.data.SolarConfig;
 import cn.solarmoon.solarmoon_core.feature.SolarMoonBase;
 import cn.solarmoon.solarmoon_core.registry.client.SolarTooltips;

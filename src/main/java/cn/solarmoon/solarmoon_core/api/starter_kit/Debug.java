@@ -1,4 +1,4 @@
-package cn.solarmoon.solarmoon_core.api.static_utor;
+package cn.solarmoon.solarmoon_core.api.starter_kit;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;

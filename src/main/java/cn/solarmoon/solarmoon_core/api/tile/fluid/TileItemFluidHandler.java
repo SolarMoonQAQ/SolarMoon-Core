@@ -1,4 +1,4 @@
-package cn.solarmoon.solarmoon_core.api.tile.inventory;
+package cn.solarmoon.solarmoon_core.api.tile.fluid;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.BlockItem;

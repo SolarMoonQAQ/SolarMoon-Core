@@ -1,6 +1,6 @@
 package cn.solarmoon.solarmoon_core.api.blockstate_access;
 
-import cn.solarmoon.solarmoon_core.api.util.LevelSummonUtil;
+import cn.solarmoon.solarmoon_core.api.util.DropUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -35,13 +35,13 @@ public interface IStackBlock {
         } else if (heldItem.isEmpty() && stack > 1) {
             level.setBlock(pos, state.setValue(STACK, stack - 1), 3);
             if (!player.isCreative()) {
-                LevelSummonUtil.summonDrop(state.getBlock().asItem(), level, pos, 1);
+                DropUtil.summonDrop(state.getBlock().asItem(), level, pos, 1);
             }
             return true;
         } else if (heldItem.isEmpty() && stack == 1) {
             level.removeBlock(pos, false);
             if (!player.isCreative()) {
-                LevelSummonUtil.summonDrop(state.getBlock().asItem(), level, pos, 1);
+                DropUtil.summonDrop(state.getBlock().asItem(), level, pos, 1);
             }
             return true;
         }

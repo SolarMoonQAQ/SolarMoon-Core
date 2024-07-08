@@ -1,7 +1,7 @@
 package cn.solarmoon.solarmoon_core.feature.generic_recipe.use;
 
 import cn.solarmoon.solarmoon_core.api.block_util.BlockUtil;
-import cn.solarmoon.solarmoon_core.api.util.LevelSummonUtil;
+import cn.solarmoon.solarmoon_core.api.util.DropUtil;
 import cn.solarmoon.solarmoon_core.registry.common.SolarRecipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -36,10 +36,10 @@ public class UseRecipeEvent {
             UseRecipe recipe = recipeOptional.get();
             if (block != recipe.outputBlock()) BlockUtil.replaceBlockWithAllState(state, recipe.outputBlock().defaultBlockState(), level, pos);
             if (!player.isCreative()) {
-                LevelSummonUtil.addItemToInventory(player, heldItem.getCraftingRemainingItem());
+                DropUtil.addItemToInventory(player, heldItem.getCraftingRemainingItem());
                 heldItem.shrink(1);
             }
-            recipe.getRolledResults(player).forEach(c -> LevelSummonUtil.summonDrop(c, level, pos));
+            recipe.getRolledResults(player).forEach(c -> DropUtil.summonDrop(c, level, pos));
             player.swing(hand);
             event.setCanceled(true);
         }

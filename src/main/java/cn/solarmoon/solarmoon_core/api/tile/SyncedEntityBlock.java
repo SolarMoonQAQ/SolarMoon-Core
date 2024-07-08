@@ -1,10 +1,8 @@
 package cn.solarmoon.solarmoon_core.api.tile;
 
 import cn.solarmoon.solarmoon_core.api.block_base.BasicEntityBlock;
-import cn.solarmoon.solarmoon_core.api.tile.fluid.ITankTile;
-import cn.solarmoon.solarmoon_core.api.tile.inventory.IContainerTile;
-import cn.solarmoon.solarmoon_core.api.util.ContainerUtil;
-import cn.solarmoon.solarmoon_core.api.util.FluidUtil;
+import cn.solarmoon.solarmoon_core.api.tile.inventory.ItemHandlerUtil;
+import cn.solarmoon.solarmoon_core.api.tile.fluid.FluidHandlerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,6 +16,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.HitResult;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -70,14 +70,13 @@ public abstract class SyncedEntityBlock extends BasicEntityBlock {
     @Override
     public int getAnalogOutputSignal(BlockState blockState, Level level, BlockPos pos) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
-        int containerSignal = 0;
-        int tankSignal = 0;
-        if (blockEntity instanceof IContainerTile) {
-            containerSignal = (int) (ContainerUtil.getScale(blockEntity) * 15);
-        }
-        if (blockEntity instanceof ITankTile tankTile) {
-            tankSignal = (int) (FluidUtil.getScale(tankTile.getTank()) * 15);
-        }
+        if (blockEntity == null) return 0;
+        int containerSignal = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
+                .map(ItemHandlerHelper::calcRedstoneFromInventory)
+                .orElse(0);
+        int tankSignal = blockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER)
+                .map(tank -> (int) FluidHandlerUtil.getScale(tank))
+                .orElse(0) * 15;
         return Math.max(containerSignal, tankSignal);
     }
 

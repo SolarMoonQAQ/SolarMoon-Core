@@ -17,7 +17,6 @@ public abstract class BaseItemRenderer extends BlockEntityWithoutLevelRenderer {
 
     public BlockRenderDispatcher blockRenderer = Minecraft.getInstance().getBlockRenderer();
     public ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-    public LocalPlayer player = Minecraft.getInstance().player;
 
     public BaseItemRenderer() {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
