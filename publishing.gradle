@@ -26,10 +26,10 @@ publishing {
             artifact sourcesJar
             pom {
                 name = "${mod_name}"
-                url = "https://github.com/HiedaCamellia/SolarMoon-Core"
+                url = "https://github.com/SolarMoonQAQ/SolarMoon-Core"
                 issueManagement {
                     system = 'github'
-                    url = 'https://github.com/HiedaCamellia/SolarMoon-Core/issues'
+                    url = 'https://github.com/SolarMoonQAQ/SolarMoon-Core/issues'
                 }
                 licenses {
                     license {
