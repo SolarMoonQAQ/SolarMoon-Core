@@ -3,10 +3,12 @@ package cn.solarmoon.solarmoon_core.api.block_base;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
@@ -33,4 +35,8 @@ public abstract class BaseCropBlock extends CropBlock {
     @Override
     public abstract VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context);
 
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> p_52286_) {
+        super.createBlockStateDefinition(p_52286_);
+    }
 }

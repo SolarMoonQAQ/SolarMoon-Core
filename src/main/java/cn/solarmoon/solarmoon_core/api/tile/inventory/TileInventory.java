@@ -44,4 +44,8 @@ public class TileInventory extends ItemStackHandler {
         blockEntity.setChanged();
     }
 
+    public BlockEntity getBlockEntity() {
+        return blockEntity;
+    }
+
 }

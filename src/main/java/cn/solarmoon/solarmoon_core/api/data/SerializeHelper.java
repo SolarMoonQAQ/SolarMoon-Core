@@ -12,6 +12,9 @@ import net.minecraft.nbt.TagParser;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
@@ -264,6 +267,37 @@ public class SerializeHelper {
         for (var vec3 : vec3List) {
             writeVec3(buf, vec3);
         }
+    }
+
+    public static MobEffectInstance readEffect(JsonObject json) {
+        ResourceLocation id = new ResourceLocation(GsonHelper.getAsString(json, "id"));
+        MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue(id);
+        int duration = GsonHelper.getAsInt(json, "duration", 0);
+        int amplifier = GsonHelper.getAsInt(json, "amplifier", 0);
+        boolean ambient = GsonHelper.getAsBoolean(json, "ambient", false);
+        boolean visible = GsonHelper.getAsBoolean(json, "visible", true);
+        boolean showIcon = GsonHelper.getAsBoolean(json, "showIcon", true);
+        return new MobEffectInstance(effect, duration, amplifier, ambient, visible, showIcon);
+    }
+
+    public static List<MobEffectInstance> readEffects(JsonObject json, String id) {
+        List<MobEffectInstance> effectInstances = new ArrayList<>();
+        if (json.has(id)) {
+            for (var element : GsonHelper.getAsJsonArray(json, id)) {
+                effectInstances.add(readEffect(element.getAsJsonObject()));
+            }
+        }
+        return effectInstances;
+    }
+
+    public static FoodValue readFoodValue(JsonObject json, String id) {
+        if (json.has(id)) {
+            JsonObject j = GsonHelper.getAsJsonObject(json, id);
+            int nutrition = GsonHelper.getAsInt(j, "nutrition");
+            float saturation = GsonHelper.getAsFloat(j, "saturation");
+            return new FoodValue(nutrition, saturation);
+        }
+        return FoodValue.EMPTY;
     }
 
 }

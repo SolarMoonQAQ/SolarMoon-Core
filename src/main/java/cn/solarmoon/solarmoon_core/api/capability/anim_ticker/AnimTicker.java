@@ -127,6 +127,7 @@ public class AnimTicker implements INBTSerializable<CompoundTag> {
                 ticks = 0;
                 enabled = false;
             }
+            if (!startOnChanged) blockEntity.setChanged();
         }
     }
 

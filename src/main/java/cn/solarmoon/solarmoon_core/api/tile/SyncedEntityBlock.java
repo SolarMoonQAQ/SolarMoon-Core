@@ -1,6 +1,7 @@
 package cn.solarmoon.solarmoon_core.api.tile;
 
 import cn.solarmoon.solarmoon_core.api.block_base.BasicEntityBlock;
+import cn.solarmoon.solarmoon_core.api.blockstate_access.IBedPartBlock;
 import cn.solarmoon.solarmoon_core.api.tile.inventory.ItemHandlerUtil;
 import cn.solarmoon.solarmoon_core.api.tile.fluid.FluidHandlerUtil;
 import net.minecraft.core.BlockPos;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.HitResult;
@@ -56,7 +58,11 @@ public abstract class SyncedEntityBlock extends BasicEntityBlock {
         ItemStack t = new ItemStack(this);
         if(blockEntity != null) {
             blockEntity.saveToItem(t);
-            drops.add(t);
+            // 防止双方块多次掉落
+            if (this instanceof IBedPartBlock) {
+                if (state.getValue(IBedPartBlock.PART) == BedPart.FOOT) drops.add(t);
+                else return drops;
+            } else drops.add(t);
         }
         return drops;
     }

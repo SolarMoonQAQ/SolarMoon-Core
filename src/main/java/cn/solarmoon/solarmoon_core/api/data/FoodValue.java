@@ -8,6 +8,8 @@ import com.google.gson.annotations.SerializedName;
  */
 public class FoodValue {
 
+    public static FoodValue EMPTY = new FoodValue(0, 0);
+
     public FoodValue(int nutrition, float saturation) {
         this.nutrition = nutrition;
         this.saturation = saturation;
@@ -33,4 +35,5 @@ public class FoodValue {
                 ", saturation=" + saturation +
                 '}';
     }
+
 }

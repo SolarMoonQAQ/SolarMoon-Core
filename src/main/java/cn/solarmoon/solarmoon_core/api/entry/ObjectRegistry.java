@@ -1,7 +1,7 @@
 package cn.solarmoon.solarmoon_core.api.entry;
 
 import cn.solarmoon.solarmoon_core.api.entry.client.LayerEntry;
-import cn.solarmoon.solarmoon_core.api.entry.client.ParticleEntry;
+import cn.solarmoon.solarmoon_core.api.entry.common.ParticleEntry;
 import cn.solarmoon.solarmoon_core.api.entry.common.*;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;

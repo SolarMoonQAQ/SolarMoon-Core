@@ -28,11 +28,18 @@ public interface ILitBlock {
         return false;
     }
 
+    static int getCommonLightLevel(BlockState state) {
+        if (state.getValues().get(LIT) != null) {
+            return state.getValue(LIT) ? 13 : 0;
+        }
+        return 0;
+    }
+
     /**
      * 打火石手动点燃
      * @return 成功返回true
      */
-    default boolean litByHand(BlockState state, BlockPos pos, Level level, Player player, InteractionHand hand) {
+    static boolean litByHand(BlockState state, BlockPos pos, Level level, Player player, InteractionHand hand) {
         ItemStack heldItem = player.getItemInHand(hand);
         //打火石等点燃
         if (!state.getValue(LIT)) {
@@ -46,8 +53,9 @@ public interface ILitBlock {
         return false;
     }
 
-    default boolean extinguishByHand(BlockState state, BlockPos pos, Level level, Player player, InteractionHand hand) {
+    static boolean extinguishByHand(BlockState state, BlockPos pos, Level level, Player player, InteractionHand hand) {
         ItemStack heldItem = player.getItemInHand(hand);
+        if (!state.getValue(LIT)) return false;
         if (heldItem.is(Items.POTION) && PotionUtils.getPotion(heldItem) == Potions.WATER) {
             if (!player.isCreative()) {
                 heldItem.shrink(1);
@@ -75,7 +83,7 @@ public interface ILitBlock {
         return false;
     }
 
-    default boolean controlLitByHand(BlockState state, BlockPos pos, Level level, Player player, InteractionHand hand) {
+    static boolean controlLitByHand(BlockState state, BlockPos pos, Level level, Player player, InteractionHand hand) {
         return litByHand(state, pos, level, player, hand) || extinguishByHand(state, pos, level, player, hand);
     }
 

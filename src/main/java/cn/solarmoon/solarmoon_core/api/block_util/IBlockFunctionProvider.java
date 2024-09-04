@@ -21,9 +21,9 @@ public interface IBlockFunctionProvider {
     /**
      * 把方块快速拿到空手里
      */
-    default boolean getThis(Player player, Level level, BlockPos pos, BlockState state, InteractionHand hand, boolean defaultSound) {
+    default boolean getThis(Player player, Level level, BlockPos pos, BlockState state, InteractionHand hand, boolean needCrouching, boolean defaultSound) {
         ItemStack heldItem = player.getItemInHand(hand);
-        if(hand.equals(InteractionHand.MAIN_HAND) && heldItem.isEmpty() && player.isCrouching()) {
+        if(hand.equals(InteractionHand.MAIN_HAND) && heldItem.isEmpty() && (!needCrouching || player.isCrouching())) {
             ItemStack copy = block().getCloneItemStack(state, HitResultUtil.getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE), level, pos, player);
             boolean flag = BlockUtil.removeDoubleBlock(level, pos);
             if (!flag) level.removeBlock(pos, false);

@@ -4,7 +4,6 @@ import cn.solarmoon.solarmoon_core.api.data.SerializeHelper;
 import cn.solarmoon.solarmoon_core.api.entry.common.RecipeEntry;
 import cn.solarmoon.solarmoon_core.api.recipe.ChanceResult;
 import cn.solarmoon.solarmoon_core.api.recipe.IConcreteRecipe;
-import cn.solarmoon.solarmoon_core.api.recipe.RecipeUtil;
 import cn.solarmoon.solarmoon_core.registry.common.SolarRecipes;
 import com.google.gson.JsonObject;
 import net.minecraft.core.NonNullList;
@@ -28,11 +27,11 @@ public record UseRecipe(
 ) implements IConcreteRecipe {
 
     public List<ItemStack> getResults() {
-        return RecipeUtil.getResults(chanceResults);
+        return ChanceResult.getResults(chanceResults);
     }
 
     public List<ItemStack> getRolledResults(Player player) {
-        return RecipeUtil.getRolledResults(player, chanceResults);
+        return ChanceResult.getRolledResults(player, chanceResults);
     }
 
     @Override

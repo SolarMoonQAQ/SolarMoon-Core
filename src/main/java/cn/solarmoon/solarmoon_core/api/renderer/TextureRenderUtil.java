@@ -27,6 +27,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -55,40 +56,44 @@ public class TextureRenderUtil {
         poseStack.popPose();
     }
 
+    public static void renderAnimatedFluid(float width, float height, float yOffset, IFluidHandler tank, BlockEntity be, PoseStack poseStack, MultiBufferSource buffer, int light) {
+        be.getCapability(SolarCapabilities.BLOCK_ENTITY_DATA).ifPresent(data -> {
+            FluidStack fluidStack = tank.getFluidInTank(0);
+            AnimTicker animTicker1 = data.getAnimTicker(1);
+            // 渲染流体过渡动画
+            int targetColor = TextureRenderUtil.getColor(fluidStack);
+            IClientFluidTypeExtensions fluidAttributes = IClientFluidTypeExtensions.of(fluidStack.getFluid());
+            ResourceLocation spriteLocation = fluidAttributes.getStillTexture(fluidStack);
+
+            poseStack.pushPose();
+            int ticks = animTicker1.getTicks();
+            float targetScale = FluidHandlerUtil.getScale(tank);
+            float h0 = animTicker1.getFixedValue(); // 当前液体高度
+
+            if (targetScale > 0 && !animTicker1.isEnabled()) {
+                h0 = targetScale;
+            } // 这一段防止放置的方块没有animTicker而不显示液体 / 同时防止液体没保存而无动画
+
+            float dh = targetScale - h0; // 当前液体与目标液体的高度比例差
+            animTicker1.setMaxTick(10);
+            int maxTicks = animTicker1.getMaxTick();
+            float progress = ((float) ticks / maxTicks);
+            float pstScale = h0 + SMath.smoothInterpolation(progress, 0, dh, 0.1f); // 当前的渲染高度比例，使用平滑插值
+            float H = pstScale * height;
+            poseStack.translate(0, yOffset, 0);
+            if (spriteLocation != null) {
+                TextureRenderUtil.render(spriteLocation,
+                        0, 0, (int) (width * 16), (int) (width * 16), width, H,
+                        targetColor, 1, 0, poseStack, buffer, light);
+            }
+            poseStack.popPose();
+            animTicker1.setFixedValue(pstScale);
+        });
+    }
+
     public static void renderAnimatedFluid(float width, float height, float yOffset, BlockEntity be, PoseStack poseStack, MultiBufferSource buffer, int light) {
         be.getCapability(ForgeCapabilities.FLUID_HANDLER).ifPresent(tank -> {
-            be.getCapability(SolarCapabilities.BLOCK_ENTITY_DATA).ifPresent(data -> {
-                FluidStack fluidStack = tank.getFluidInTank(0);
-                AnimTicker animTicker1 = data.getAnimTicker(1);
-                // 渲染流体过渡动画
-                int targetColor = TextureRenderUtil.getColor(fluidStack);
-                IClientFluidTypeExtensions fluidAttributes = IClientFluidTypeExtensions.of(fluidStack.getFluid());
-                ResourceLocation spriteLocation = fluidAttributes.getStillTexture(fluidStack);
-
-                poseStack.pushPose();
-                int ticks = animTicker1.getTicks();
-                float targetScale = FluidHandlerUtil.getScale(tank);
-                float h0 = animTicker1.getFixedValue(); // 当前液体高度
-
-                if (targetScale > 0 && !animTicker1.isEnabled()) {
-                    h0 = targetScale;
-                } // 这一段防止放置的方块没有animTicker而不显示液体 / 同时防止液体没保存而无动画
-
-                float dh = targetScale - h0; // 当前液体与目标液体的高度比例差
-                animTicker1.setMaxTick(10);
-                int maxTicks = animTicker1.getMaxTick();
-                float progress = ((float) ticks / maxTicks);
-                float pstScale = h0 + SMath.smoothInterpolation(progress, 0, dh, 0.1f); // 当前的渲染高度比例，使用平滑插值
-                float H = pstScale * height;
-                poseStack.translate(0, yOffset, 0);
-                if (spriteLocation != null) {
-                    TextureRenderUtil.render(spriteLocation,
-                            0, 0, (int) (width * 16), (int) (width * 16), width, H,
-                            targetColor, 1, 0, poseStack, buffer, light);
-                }
-                poseStack.popPose();
-                animTicker1.setFixedValue(pstScale);
-            });
+            renderAnimatedFluid(width, height, yOffset, tank, be, poseStack, buffer, light);
         });
     }
 
@@ -113,21 +118,25 @@ public class TextureRenderUtil {
 
     public static void renderStaticFluid(float width, float height, float yOffset, BlockEntity blockEntity, PoseStack poseStack, MultiBufferSource buffer, int light) {
         blockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER).ifPresent(tank -> {
-            poseStack.pushPose();
-            poseStack.translate(0, yOffset, 0);
-            FluidStack fluidStack = tank.getFluidInTank(0);
-            int targetColor = TextureRenderUtil.getColor(fluidStack);
-            Fluid fluid = fluidStack.getFluid();
-            IClientFluidTypeExtensions fluidAttributes = IClientFluidTypeExtensions.of(fluid);
-            ResourceLocation spriteLocation = fluidAttributes.getStillTexture(fluidStack);
-            float H = FluidHandlerUtil.getScale(tank) * height;
-            if (spriteLocation != null) {
-                TextureRenderUtil.render(spriteLocation,
-                        0, 0, (int) (width * 16), (int) (width * 16), width, H,
-                        targetColor, 1, 0, poseStack, buffer, light);
-            }
-            poseStack.popPose();
+            renderStaticFluid(width, height, yOffset, tank, poseStack, buffer, light);
         });
+    }
+
+    public static void renderStaticFluid(float width, float height, float yOffset, IFluidHandler tank, PoseStack poseStack, MultiBufferSource buffer, int light) {
+        poseStack.pushPose();
+        poseStack.translate(0, yOffset, 0);
+        FluidStack fluidStack = tank.getFluidInTank(0);
+        int targetColor = TextureRenderUtil.getColor(fluidStack);
+        Fluid fluid = fluidStack.getFluid();
+        IClientFluidTypeExtensions fluidAttributes = IClientFluidTypeExtensions.of(fluid);
+        ResourceLocation spriteLocation = fluidAttributes.getStillTexture(fluidStack);
+        float H = FluidHandlerUtil.getScale(tank) * height;
+        if (spriteLocation != null) {
+            TextureRenderUtil.render(spriteLocation,
+                    0, 0, (int) (width * 16), (int) (width * 16), width, H,
+                    targetColor, 1, 0, poseStack, buffer, light);
+        }
+        poseStack.popPose();
     }
 
     public static void renderFluid(int color, float alpha, int luminosity, int minU, int minV, int maxU, int maxV,

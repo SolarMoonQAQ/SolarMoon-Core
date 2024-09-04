@@ -1,4 +1,4 @@
-package cn.solarmoon.solarmoon_core.api.entry.client;
+package cn.solarmoon.solarmoon_core.api.entry.common;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.ParticleEngine;
@@ -51,8 +51,7 @@ public class ParticleEntry<P extends ParticleOptions> {
     }
 
     public void registerParticleProviders(RegisterParticleProvidersEvent event) {
-        ParticleEngine engine = Minecraft.getInstance().particleEngine;
-        engine.register(getR(), provider);
+        event.registerSpriteSet(getR(), provider);
     }
 
     public P get() {

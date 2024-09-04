@@ -12,6 +12,7 @@ dependencies {
 }
 
 repositories {
+    mavenCentral()
     maven {
         name = "Progwml6 maven"
         url = "https://dvs1.progwml6.com/files/maven/"
@@ -52,6 +53,10 @@ repositories {
     }
     maven {
         url = "https://maven.theillusivec4.top/"
+    }
+    maven {
+        name = 'Kotlin for Forge'
+        url = 'https://thedarkcolour.github.io/KotlinForForge/'
     }
     flatDir {
         dir 'lib'

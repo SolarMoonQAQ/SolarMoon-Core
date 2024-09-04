@@ -1,18 +1,17 @@
 package cn.solarmoon.solarmoon_core.api.entry.common;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import cn.solarmoon.solarmoon_core.api.fluid_base.BaseFluidType;
+import cn.solarmoon.solarmoon_core.api.fluid_base.WaterLikeFluidType;
+import cn.solarmoon.solarmoon_core.api.fluid_base.SimpleFluid;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class FluidEntry {
@@ -23,12 +22,9 @@ public class FluidEntry {
     private final DeferredRegister<Block> blockRegister;
     private final String modId;
 
-    private ResourceLocation spriteStill;
-    private ResourceLocation spriteFlowing;
-    private ResourceLocation spriteOverlay;
-    private boolean defaultSprite;
-    private int color;
+    private final int defaultColor;
     private String id;
+    private FluidType.Properties properties;
     private Supplier<LiquidBlock> blockSupplier;
     private Supplier<FlowingFluid> stillSupplier;
     private Supplier<FlowingFluid> flowingSupplier;
@@ -46,8 +42,7 @@ public class FluidEntry {
         this.itemRegister = itemRegister;
         this.blockRegister = blockRegister;
         this.modId = modId;
-        this.defaultSprite = false;
-        this.color = 0xFFFFFFFF;
+        this.defaultColor = 0xFFFFFFFF;
     }
 
     public FluidEntry id(String id) {
@@ -55,7 +50,42 @@ public class FluidEntry {
         return this;
     }
 
-    public FluidEntry bound(Supplier<LiquidBlock> blockSupplier) {
+    public FluidEntry fluidType(Supplier<FluidType> fluidTypeSupplier) {
+        this.fluidTypeSupplier = fluidTypeSupplier;
+        return this;
+    }
+
+    public FluidEntry properties(FluidType.Properties properties) {
+        this.properties = properties;
+        return this;
+    }
+
+    public FluidEntry waterLikeProperties(boolean canConvertToSource) {
+        properties = WaterLikeFluidType.waterLikeProperties(canConvertToSource);
+        return this;
+    }
+
+    public FluidEntry waterLike(boolean defaultUnderOverlay) {
+        fluidTypeSupplier = () -> new WaterLikeFluidType(modId, id, defaultColor, defaultUnderOverlay, properties);
+        return this;
+    }
+
+    public FluidEntry waterLike(boolean defaultUnderOverlay, int color) {
+        fluidTypeSupplier = () -> new WaterLikeFluidType(modId, id, color, defaultUnderOverlay, properties);
+        return this;
+    }
+
+    public FluidEntry base() {
+        fluidTypeSupplier = () -> new BaseFluidType(modId, id, defaultColor, properties);
+        return this;
+    }
+
+    public FluidEntry base(int color) {
+        fluidTypeSupplier = () -> new BaseFluidType(modId, id, color, properties);
+        return this;
+    }
+
+    public FluidEntry block(Supplier<LiquidBlock> blockSupplier) {
         this.blockSupplier = blockSupplier;
         return this;
     }
@@ -75,18 +105,11 @@ public class FluidEntry {
         return this;
     }
 
-    public FluidEntry waterLike() {
-        this.defaultSprite = true;
-        return this;
-    }
-
-    public FluidEntry color(int color) {
-        this.color = color;
-        return this;
-    }
-
-    public FluidEntry fluidType(Supplier<FluidType> fluidTypeSupplier) {
-        this.fluidTypeSupplier = fluidTypeSupplier;
+    public FluidEntry simple(Supplier<SimpleFluid> simpleFluidSupplier, boolean hasBucket) {
+        block(() -> simpleFluidSupplier.get().getBlock());
+        still(() -> simpleFluidSupplier.get().getSource());
+        flowing(() -> simpleFluidSupplier.get().getFlowing());
+        if (hasBucket) bucket(() -> simpleFluidSupplier.get().getBucket());
         return this;
     }
 
@@ -95,73 +118,7 @@ public class FluidEntry {
         fluidStill = fluidRegister.register(id, stillSupplier);
         fluidFlowing = fluidRegister.register(id + "_flowing", flowingSupplier);
         if (bucketSupplier != null) fluidBucket = itemRegister.register(id + "_bucket", bucketSupplier);
-        if (fluidTypeSupplier == null) {
-            if (defaultSprite) {
-                this.spriteStill = new ResourceLocation("minecraft:block/water" + "_still");
-                this.spriteFlowing = new ResourceLocation("minecraft:block/water" + "_flow");
-                this.spriteOverlay = new ResourceLocation(modId + ":textures/misc/" + id + "_under.png");
-                fluidType = fluidTypeRegister.register(id, () -> new FluidType(FluidType.Properties.create()) {
-                    @Override
-                    public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
-                        consumer.accept(new IClientFluidTypeExtensions() {
-                            @Override
-                            public ResourceLocation getStillTexture() {
-                                return spriteStill;
-                            }
-
-                            @Override
-                            public ResourceLocation getFlowingTexture() {
-                                return spriteFlowing;
-                            }
-
-                            @Override
-                            public ResourceLocation getRenderOverlayTexture(Minecraft mc) {
-                                return spriteOverlay;
-                            }
-
-                            @Override
-                            public int getTintColor() {
-                                return color;
-                            }
-                        });
-                    }
-                });
-            } else {
-                this.spriteStill = new ResourceLocation(modId + ":block/fluid/" + id + "_still");
-                this.spriteFlowing = new ResourceLocation(modId + ":block/fluid/" + id + "_flow");
-                this.spriteOverlay = new ResourceLocation(modId + ":textures/misc/" + id + "_under.png");
-                fluidType = fluidTypeRegister.register(id, () -> new FluidType(FluidType.Properties.create()) {
-                    @Override
-                    public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
-                        consumer.accept(new IClientFluidTypeExtensions() {
-
-                            @Override
-                            public ResourceLocation getStillTexture() {
-                                return spriteStill;
-                            }
-
-                            @Override
-                            public ResourceLocation getFlowingTexture() {
-                                return spriteFlowing;
-                            }
-
-                            @Override
-                            public ResourceLocation getRenderOverlayTexture(Minecraft mc) {
-                                return spriteOverlay;
-                            }
-
-                            @Override
-                            public int getTintColor() {
-                                return color;
-                            }
-                        });
-                    }
-                });
-            }
-        }
-        else {
-            fluidType = fluidTypeRegister.register(id, fluidTypeSupplier);
-        }
+        fluidType = fluidTypeRegister.register(id, fluidTypeSupplier);
         return this;
     }
 

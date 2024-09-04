@@ -50,7 +50,9 @@ public abstract class ItemMixin implements IForgeItem {
                     BlockState state =  bound.getValue().getStateForPlacement(new BlockPlaceContext(context));
                     if (state != null && canPlace(new BlockPlaceContext(context), state)) {
                         stack.shrink(1);
+                        BlockState old = level.getBlockState(pos);
                         level.setBlock(pos, state, 3);
+                        level.sendBlockUpdated(pos, old, state, 3);
                         level.playSound(null, pos, state.getSoundType().getPlaceSound(), SoundSource.BLOCKS);
                         player.swing(context.getHand());
                     }

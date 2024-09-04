@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -33,6 +34,9 @@ public abstract class BlockMixin extends BlockBehaviour {
     @Shadow public abstract BlockState defaultBlockState();
 
     @Shadow private BlockState defaultBlockState;
+
+    @Shadow protected abstract void registerDefaultState(BlockState p_49960_);
+
     private Block block = (Block)(Object)this;
 
     public BlockMixin(Properties p_60452_) {
@@ -62,11 +66,14 @@ public abstract class BlockMixin extends BlockBehaviour {
         if (block instanceof IDoubleBlock doubleBlock) {
             state = state.setValue(doubleBlock.HALF, doubleBlock.getDefaultHalfValue());
         }
+        if (block instanceof IMultilayerBlock layer) {
+            state = state.setValue(layer.LAYER, 0);
+        }
         this.defaultBlockState = state;
     }
 
-    @Inject(method = "createBlockStateDefinition", at = @At("HEAD"))
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder, CallbackInfo ci) {
+    @ModifyArg(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;createBlockStateDefinition(Lnet/minecraft/world/level/block/state/StateDefinition$Builder;)V"))
+    private StateDefinition.Builder<Block, BlockState> modifyBuilder(StateDefinition.Builder<Block, BlockState> builder) {
         if (block instanceof IHorizontalFacingBlock facingBlock) {
             builder.add(facingBlock.FACING);
         }
@@ -88,6 +95,10 @@ public abstract class BlockMixin extends BlockBehaviour {
         if (block instanceof IDoubleBlock doubleBlock) {
             builder.add(doubleBlock.HALF);
         }
+        if (block instanceof IMultilayerBlock) {
+            builder.add(IMultilayerBlock.LAYER);
+        }
+        return builder;
     }
 
     @Inject(method = "getStateForPlacement", at = @At("HEAD"), cancellable = true)

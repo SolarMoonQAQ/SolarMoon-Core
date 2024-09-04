@@ -29,4 +29,8 @@ public class TileTank extends FluidTank {
         blockEntity.setChanged();
     }
 
+    public BlockEntity getBlockEntity() {
+        return blockEntity;
+    }
+
 }

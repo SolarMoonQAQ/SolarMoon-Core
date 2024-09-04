@@ -36,22 +36,22 @@ public record AttributeData(Attribute attribute, AttributeModifier attributeModi
         return new AttributeData(attribute, modifier);
     }
 
-    public static AttributeData read(FriendlyByteBuf buffer) {
-        String id = buffer.readUtf();
-        double value = buffer.readDouble();
-        UUID uuid = buffer.readUUID();
-        AttributeModifier.Operation operation = buffer.readEnum(AttributeModifier.Operation.class);
+    public static AttributeData read(FriendlyByteBuf buf) {
+        String id = buf.readUtf();
+        double value = buf.readDouble();
+        UUID uuid = buf.readUUID();
+        AttributeModifier.Operation operation = buf.readEnum(AttributeModifier.Operation.class);
 
         Attribute attribute = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(id));
         AttributeModifier modifier = new AttributeModifier(uuid, TextUtil.splitFromColon(id), value, operation);
         return new AttributeData(attribute, modifier);
     }
 
-    public void write(FriendlyByteBuf buffer) {
-        buffer.writeUtf(ForgeRegistries.ATTRIBUTES.getKey(attribute).toString());
-        buffer.writeDouble(attributeModifier.getAmount());
-        buffer.writeUUID(attributeModifier.getId());
-        buffer.writeEnum(attributeModifier.getOperation());
+    public void write(FriendlyByteBuf buf) {
+        buf.writeUtf(ForgeRegistries.ATTRIBUTES.getKey(attribute).toString());
+        buf.writeDouble(attributeModifier.getAmount());
+        buf.writeUUID(attributeModifier.getId());
+        buf.writeEnum(attributeModifier.getOperation());
     }
 
 }
